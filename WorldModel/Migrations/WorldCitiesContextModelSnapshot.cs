@@ -41,8 +41,7 @@ namespace WorldModel.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nchar(50)")
-                        .IsFixedLength();
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Population")
                         .HasColumnType("int");
@@ -51,7 +50,7 @@ namespace WorldModel.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("WorldModel.Country", b =>
@@ -79,12 +78,11 @@ namespace WorldModel.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nchar(50)")
-                        .IsFixedLength();
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("WorldModel.City", b =>
@@ -92,8 +90,8 @@ namespace WorldModel.Migrations
                     b.HasOne("WorldModel.Country", "Country")
                         .WithMany("Cities")
                         .HasForeignKey("CountryId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Cities_Countries");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Country");
                 });

@@ -28,22 +28,11 @@ public partial class WorldCitiesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<City>(entity =>
-        {
-            entity.Property(e => e.Name).IsFixedLength();
-
-            entity.HasOne(d => d.Country).WithMany(p => p.Cities)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Cities_Countries");
-        });
-
         modelBuilder.Entity<Country>(entity =>
         {
             entity.Property(e => e.Iso2).IsFixedLength();
             entity.Property(e => e.Iso3).IsFixedLength();
-            entity.Property(e => e.Name).IsFixedLength();
-        });
-
+        }); 
         OnModelCreatingPartial(modelBuilder);
     }
 

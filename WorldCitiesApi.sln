@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldCitiesApi", "WorldCitiesApi\WorldCitiesApi.csproj", "{627EFE32-9D4C-43B4-8209-A90142529318}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F8E22734-79E4-44F5-AEA6-75C53E3ABAB1} = {F8E22734-79E4-44F5-AEA6-75C53E3ABAB1}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldModel", "WorldModel\WorldModel.csproj", "{F8E22734-79E4-44F5-AEA6-75C53E3ABAB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldModel", "WorldModel\WorldModel.csproj", "{F8E22734-79E4-44F5-AEA6-75C53E3ABAB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
