@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Serilog.Core;
+using Serilog;
 using WorldModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<WorldCitiesContext>(optionsBuilder =>
 
 WebApplication app = builder.Build();
 
+using Logger log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -29,5 +31,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+log.Information(connectionString ?? "not assigned");
 
 app.Run();

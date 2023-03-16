@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorldModel;
 
@@ -24,10 +19,6 @@ namespace WorldCitiesApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
         {
-          if (_context.Countries == null)
-          {
-              return NotFound();
-          }
             return await _context.Countries.ToListAsync();
         }
 
@@ -35,18 +26,8 @@ namespace WorldCitiesApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(int id)
         {
-          if (_context.Countries == null)
-          {
-              return NotFound();
-          }
             Country? country = await _context.Countries.FindAsync(id);
-
-            if (country == null)
-            {
-                return NotFound();
-            }
-
-            return country;
+            return country == null ? NotFound() : country;
         }
 
         // PUT: api/Countries/5
@@ -71,10 +52,8 @@ namespace WorldCitiesApi.Controllers
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
 
             return NoContent();
@@ -85,24 +64,16 @@ namespace WorldCitiesApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Country>> PostCountry(Country country)
         {
-          if (_context.Countries == null)
-          {
-              return Problem("Entity set 'WorldCitiesContext.Countries'  is null.");
-          }
             _context.Countries.Add(country);
-            await _context.SaveChangesAsync();
+          await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCountry", new { id = country.Id }, country);
+          return CreatedAtAction("GetCountry", new { id = country.Id }, country);
         }
 
         // DELETE: api/Countries/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCountry(int id)
         {
-            if (_context.Countries == null)
-            {
-                return NotFound();
-            }
             Country? country = await _context.Countries.FindAsync(id);
             if (country == null)
             {
@@ -115,9 +86,6 @@ namespace WorldCitiesApi.Controllers
             return NoContent();
         }
 
-        private bool CountryExists(int id)
-        {
-            return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        private bool CountryExists(int id) => _context.Countries.Any(e => e.Id == id);
     }
 }
