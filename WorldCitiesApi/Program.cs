@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using WorldCitiesApi;
 using WorldModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WorldCitiesContext>(optionsBuilder =>
     optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentity<WorldCitiesUser, IdentityRole>()
+    .AddEntityFrameworkStores<WorldCitiesContext>();
+
+builder.Services.AddScoped<JwtHandler>();
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +33,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

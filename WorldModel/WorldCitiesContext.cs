@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace WorldModel;
 
-public partial class WorldCitiesContext : DbContext
+public partial class WorldCitiesContext : IdentityDbContext<WorldCitiesUser>
 {
     public WorldCitiesContext()
     {
@@ -28,6 +29,7 @@ public partial class WorldCitiesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Country>(entity =>
         {
             entity.Property(e => e.Iso2).IsFixedLength();
