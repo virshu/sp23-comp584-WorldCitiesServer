@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using WorldCitiesApi;
 using WorldModel;
 
@@ -23,7 +22,6 @@ builder.Services.AddScoped<JwtHandler>();
 
 WebApplication app = builder.Build();
 
-using Logger log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -38,8 +36,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-log.Information(connectionString ?? "not assigned");
 
 app.Run();
