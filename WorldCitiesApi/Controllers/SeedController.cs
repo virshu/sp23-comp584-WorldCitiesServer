@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using CsvHelper.Configuration;
+using WorldCitiesApi.Data;
 using WorldModel;
+using CsvReader = CsvHelper.CsvReader;
 
 namespace WorldCitiesApi.Controllers {
     [Route("api/[controller]")]
@@ -10,15 +15,54 @@ namespace WorldCitiesApi.Controllers {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly WorldCitiesContext _context;
+        private readonly string _pathName;
 
         public SeedController(UserManager<WorldCitiesUser> userManager, RoleManager<IdentityRole> roleManager, 
-            IConfiguration configuration, WorldCitiesContext context)
+            IConfiguration configuration, WorldCitiesContext context, IHostEnvironment environment)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _context = context;
+            _pathName = Path.Combine(environment.ContentRootPath, "Data/worldcities.csv");
         }
+
+        // POST: api/Seed
+        [HttpPost("Countries")]
+        public async Task<IActionResult> ImportCountries() {
+            // create a lookup dictionary containing all the countries already existing 
+            // into the Database (it will be empty on first run).
+            Dictionary<string, Country> countriesByName = _context.Countries
+                .AsNoTracking().ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+
+            CsvConfiguration config = new(CultureInfo.InvariantCulture) {
+                HasHeaderRecord = true,
+                HeaderValidated = null
+            };
+
+            using StreamReader reader = new(_pathName);
+            using CsvReader csv = new(reader, config);
+
+            IEnumerable<WorldCitiesCsv>? records = csv.GetRecords<WorldCitiesCsv>();
+            foreach (WorldCitiesCsv record in records) {
+                if (countriesByName.ContainsKey(record.country)) {
+                    continue;
+                }
+
+                Country country = new() {
+                    Name = record.country,
+                    Iso2 = record.iso2,
+                    Iso3 = record.iso3
+                };
+                await _context.Countries.AddAsync(country);
+                countriesByName.Add(record.country, country);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(countriesByName.Count);
+        }
+
 
         [HttpPost("Users")]
         public async Task<IActionResult> ImportUsers() {
