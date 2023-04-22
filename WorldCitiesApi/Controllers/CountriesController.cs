@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WorldCitiesApi.Dtos;
 using WorldModel;
 
 namespace WorldCitiesApi.Controllers
@@ -21,15 +22,26 @@ namespace WorldCitiesApi.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
         {
-            return await _context.Countries.ToListAsync();
+            List<Country> countries = await _context.Countries.ToListAsync();
+            return countries;
         }
 
         // GET: api/Countries/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Country>> GetCountry(int id)
+        public async Task<ActionResult<CountryPopulation>> GetCountryPopulation(int id)
         {
-            Country? country = await _context.Countries.FindAsync(id);
-            return country == null ? NotFound() : country;
+            CountryPopulation? countryPopulation = await _context.Countries.Where(c => c.Id == id)
+                .Select(c => new CountryPopulation
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Population = c.Cities.Sum(t => t.Population)
+                }).SingleOrDefaultAsync();
+            if (countryPopulation is null)
+            {
+                return NotFound();
+            }
+            return countryPopulation;
         }
 
         // PUT: api/Countries/5
@@ -69,7 +81,7 @@ namespace WorldCitiesApi.Controllers
             _context.Countries.Add(country);
           await _context.SaveChangesAsync();
 
-          return CreatedAtAction("GetCountry", new { id = country.Id }, country);
+          return CreatedAtAction("GetCountryPopulation", new { id = country.Id }, country);
         }
 
         // DELETE: api/Countries/5
