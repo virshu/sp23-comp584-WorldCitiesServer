@@ -28,6 +28,13 @@ namespace WorldCitiesApi.Controllers
 
         // GET: api/Countries/5
         [HttpGet("{id}")]
+        public async Task<ActionResult<Country>> GetCountry(int id)
+        {
+            Country? country = await _context.Countries.FindAsync(id);
+            return country is null ? NotFound() : country;
+        }
+
+        [HttpGet("Population/{id}")]
         public async Task<ActionResult<CountryPopulation>> GetCountryPopulation(int id)
         {
             CountryPopulation? countryPopulation = await _context.Countries.Where(c => c.Id == id)
@@ -37,15 +44,11 @@ namespace WorldCitiesApi.Controllers
                     Name = c.Name,
                     Population = c.Cities.Sum(t => t.Population)
                 }).SingleOrDefaultAsync();
-            if (countryPopulation is null)
-            {
-                return NotFound();
-            }
-            return countryPopulation;
+            return countryPopulation is null ? NotFound() : countryPopulation;
         }
 
         // PUT: api/Countries/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(int id, Country country)
         {
